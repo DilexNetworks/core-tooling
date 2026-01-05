@@ -15,8 +15,10 @@ fi
 REPO="DilexNetworks/core-tooling"   # change org if needed
 DEST_DIR="tooling/mk"
 VERSION_FILE="tooling/CORE_TOOLING_VERSION"
+TEMPLATES_DEST_DIR="tooling/templates"
 
 mkdir -p "$DEST_DIR"
+mkdir -p "$TEMPLATES_DEST_DIR"
 
 echo "→ Fetching core-tooling $VERSION"
 tmp="$(mktemp -d)"
@@ -35,6 +37,10 @@ fi
 
 cp -R "$tmp/core-tooling/mk/." "$DEST_DIR/"
 
+if [[ -d "$tmp/core-tooling/templates" ]]; then
+  cp -R "$tmp/core-tooling/templates/." "$TEMPLATES_DEST_DIR/"
+fi
+
 echo "$VERSION" > "$VERSION_FILE"
-echo "✅ Installed core-tooling $VERSION into $DEST_DIR"
+echo "✅ Installed core-tooling $VERSION into $DEST_DIR and $TEMPLATES_DEST_DIR"
 echo "   Pinned version written to $VERSION_FILE"

@@ -1,3 +1,8 @@
+# Resolve the templates directory relative to this mk file.
+# Works both in core-tooling itself (mk/../templates) and when vendored (tooling/mk/../templates).
+_THIS_MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+CORE_TOOLING_TEMPLATES_DIR ?= $(abspath $(_THIS_MK_DIR)/../templates)
+
 # Where Hugo (or other consumers) can read version metadata
 VERSION_JSON ?= $(DATA_DIR)/version.json
 
@@ -64,21 +69,31 @@ init-versioning:
 	@if [ -f "$(VERSION_FILE)" ]; then \
 	  echo "ℹ️  $(VERSION_FILE) already exists"; \
 	else \
-	  echo "→ Creating $(VERSION_FILE)"; \
-	  echo "0.1.0" > "$(VERSION_FILE)"; \
+	  if [ -f "$(CORE_TOOLING_TEMPLATES_DIR)/VERSION" ]; then \
+	    echo "→ Creating $(VERSION_FILE) from templates"; \
+	    cp "$(CORE_TOOLING_TEMPLATES_DIR)/VERSION" "$(VERSION_FILE)"; \
+	  else \
+	    echo "→ Creating $(VERSION_FILE)"; \
+	    echo "0.1.0" > "$(VERSION_FILE)"; \
+	  fi; \
 	fi
 	@if [ -f "$(BUMPVER_FILE)" ]; then \
 	  echo "ℹ️  $(BUMPVER_FILE) already exists"; \
 	else \
-	  echo "→ Creating $(BUMPVER_FILE)"; \
-	  printf '%s\n' \
-	    '[bumpversion]' \
-	    'current_version = 0.1.0' \
-	    'commit = False' \
-	    'tag = False' \
-	    '' \
-	    "[bumpversion:file:$(VERSION_FILE)]" \
-	    > "$(BUMPVER_FILE)"; \
+	  if [ -f "$(CORE_TOOLING_TEMPLATES_DIR)/bumpversion.cfg" ]; then \
+	    echo "→ Creating $(BUMPVER_FILE) from templates"; \
+	    cp "$(CORE_TOOLING_TEMPLATES_DIR)/bumpversion.cfg" "$(BUMPVER_FILE)"; \
+	  else \
+	    echo "→ Creating $(BUMPVER_FILE)"; \
+	    printf '%s\n' \
+	      '[bumpversion]' \
+	      'current_version = 0.1.0' \
+	      'commit = False' \
+	      'tag = False' \
+	      '' \
+	      "[bumpversion:file:$(VERSION_FILE)]" \
+	      > "$(BUMPVER_FILE)"; \
+	  fi; \
 	fi
 
 commit_and_push:

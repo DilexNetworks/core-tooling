@@ -44,7 +44,7 @@ HOST_IP := $(shell ipconfig getifaddr en0 2>/dev/null || \
 	echo localhost)
 
 # Default Hugo config args: assumes hugo.toml in SITE_DIR
-HUGO_CONFIG_ARGS ?= --config $(SITE_DIR)/hugo.toml
+HUGO_CONFIG_ARGS ?= --config $(SITE_DIR)/config/_default/hugo.toml
 
 # Default baseURL for dev (override if you prefer localhost)
 HUGO_BASEURL ?= http://$(HOST_IP):$(DEV_PORT)/
@@ -67,14 +67,14 @@ cache_ensure:
 			echo "✅ Hugo/Go module cache already populated"; \
 		else \
 			echo "⬇️  Warming Hugo/Go module cache (first run)"; \
-			hugo mod get --source "$(SITE_DIR)" && hugo mod tidy --source "$(SITE_DIR)"; \
+			hugo --source "$(SITE_DIR)" mod get && hugo --source "$(SITE_DIR)" mod tidy; \
 		fi'
 
 cache_warm:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'hugo mod get --source "$(SITE_DIR)" && hugo mod tidy --source "$(SITE_DIR)"'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'hugo --source "$(SITE_DIR)" mod get && hugo --source "$(SITE_DIR)" mod tidy'
 
 modules_update:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'hugo mod get -u --source "$(SITE_DIR)" && hugo mod tidy --source "$(SITE_DIR)"'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'hugo --source "$(SITE_DIR)" mod get -u && hugo --source "$(SITE_DIR)" mod tidy'
 
 cache_clear:
 	-$(OCI_RUNTIME) volume rm $(HUGO_CACHE_VOL) $(GO_MOD_CACHE_VOL)
