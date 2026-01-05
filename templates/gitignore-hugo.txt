@@ -1,0 +1,9 @@
+# Hugo build artifacts
+public/
+resources/
+.hugo_cache/
+
+# If site lives under site/
+site/public/
+site/resources/
+site/.hugo_cache/
