@@ -67,14 +67,14 @@ cache_ensure:
 			echo "✅ Hugo/Go module cache already populated"; \
 		else \
 			echo "⬇️  Warming Hugo/Go module cache (first run)"; \
-			cd "$(SITE_DIR)" && hugo mod get && hugo mod tidy; \
+			cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get && hugo --config config/_default/hugo.toml mod tidy; \
 		fi'
 
 cache_warm:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo mod get && hugo mod tidy'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get && hugo --config config/_default/hugo.toml mod tidy'
 
 modules_update:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo mod get -u && hugo mod tidy'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get -u && hugo --config config/_default/hugo.toml mod tidy'
 
 cache_clear:
 	-$(OCI_RUNTIME) volume rm $(HUGO_CACHE_VOL) $(GO_MOD_CACHE_VOL)
