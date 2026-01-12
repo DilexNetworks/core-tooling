@@ -13,6 +13,10 @@ VERSION_FILE ?= VERSION
 BUMPVER_FILE ?= .bumpversion.cfg
 
 # Include the tooling Make fragments from THIS repo (not vendored).
+#
+#  NOTE:
+# help.mk must be included *after* all mk files that contribute help
+# (node.mk, python.mk, smoke.mk, etc.)
 include mk/core.mk
 include mk/doctor.mk
 include mk/git.mk
