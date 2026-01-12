@@ -14,8 +14,11 @@ BUMPVER_FILE ?= .bumpversion.cfg
 
 # Include the tooling Make fragments from THIS repo (not vendored).
 include mk/core.mk
-include mk/help.mk
 include mk/doctor.mk
 include mk/git.mk
+include mk/node.mk
+include mk/python.mk
 include mk/release.mk
+include mk/smoke.mk
+include mk/help.mk
 

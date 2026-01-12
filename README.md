@@ -34,6 +34,7 @@ known version, commit them, and update explicitly when desired.
 ```text
 mk/
   core.mk              # shared defaults and variables
+  node.mk              # Node.js / CDK helper targets (optional)
   help.mk              # `make help` output and default target
   doctor.mk            # environment validation
   git.mk               # git safety checks
@@ -69,6 +70,32 @@ include tooling/mk/release.mk
 # Optional (Hugo sites only, container-based)
 include tooling/mk/container-hugo.mk
 ```
+
+### Node / CDK repositories
+
+Repositories that use Node.js (libraries, CDK apps, tooling) can opt in to
+standard Node and CDK helper targets by including `node.mk`:
+
+```make
+include tooling/mk/node.mk
+```
+
+This adds the following targets:
+
+- `make install|ci|build|test|lint|clean`
+- `make cdk-synth|cdk-diff|cdk-deploy|cdk-destroy`
+
+Defaults:
+- `PROJECT_DIR=.` (directory containing `package.json`)
+- `CDK_DIR=infra`
+
+Extra CDK arguments may be passed via:
+
+```bash
+make cdk-deploy CDK_ARGS='--all'
+```
+
+Repositories that do not use Node.js or CDK should simply omit `node.mk`.
 
 ---
 
