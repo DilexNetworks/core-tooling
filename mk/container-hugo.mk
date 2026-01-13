@@ -2,7 +2,11 @@
 # Containerized Hugo toolchain (OCI runtime)
 # -----------------------------
 HUGO_IMAGE ?= wyllie/hugo:latest
+
 HUGO_WORKDIR ?= /app
+
+# Default site directory (repo layout: ./site contains hugo.toml/go.mod)
+SITE_DIR ?= site
 
 DEV_PORT ?= 1313
 
@@ -67,14 +71,20 @@ cache_ensure:
 			echo "✅ Hugo/Go module cache already populated"; \
 		else \
 			echo "⬇️  Warming Hugo/Go module cache (first run)"; \
-			cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get && hugo --config config/_default/hugo.toml mod tidy; \
+			if [ -f "$(SITE_DIR)/go.mod" ]; then \
+				cd "$(SITE_DIR)" && hugo mod get && hugo mod tidy; \
+			elif [ -f "go.mod" ]; then \
+				hugo mod get && hugo mod tidy; \
+			else \
+				echo "ℹ️  No go.mod found (neither $(SITE_DIR)/go.mod nor ./go.mod); skipping module warm"; \
+			fi; \
 		fi'
 
 cache_warm:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get && hugo --config config/_default/hugo.toml mod tidy'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo mod get && hugo mod tidy'
 
 modules_update:
-	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo --config config/_default/hugo.toml mod get -u && hugo --config config/_default/hugo.toml mod tidy'
+	@$(OCI_RUN) $(HUGO_IMAGE) /bin/bash -lc 'cd "$(SITE_DIR)" && hugo mod get -u && hugo mod tidy'
 
 cache_clear:
 	-$(OCI_RUNTIME) volume rm $(HUGO_CACHE_VOL) $(GO_MOD_CACHE_VOL)
