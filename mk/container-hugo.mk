@@ -29,7 +29,7 @@ OCI_RUN_ROOT = $(OCI_RUNTIME) run --rm -it \
 	-e GOCACHE=$(GOCACHE) \
 	-v "$(HUGO_CACHE_VOL):$(HUGO_CACHEDIR)" \
 	-v "$(GO_MOD_CACHE_VOL):/cache/go" \
-    -v "$(HOST_WORKDIR):$(HUGO_WORKDIR)"
+    -v "$(HOST_WORKDIR):$(HUGO_WORKDIR)" \
 	-w "$(HUGO_WORKDIR)"
 
 OCI_RUN = $(OCI_RUNTIME) run --rm -it \
@@ -39,7 +39,7 @@ OCI_RUN = $(OCI_RUNTIME) run --rm -it \
 	-e GOCACHE=$(GOCACHE) \
 	-v "$(HUGO_CACHE_VOL):$(HUGO_CACHEDIR)" \
 	-v "$(GO_MOD_CACHE_VOL):/cache/go" \
-    -v "$(HOST_WORKDIR):$(HUGO_WORKDIR)"
+    -v "$(HOST_WORKDIR):$(HUGO_WORKDIR)" \
 	-w "$(HUGO_WORKDIR)"
 
 OCI_RUN_DEV = $(OCI_RUN) -p $(DEV_PORT):1313
