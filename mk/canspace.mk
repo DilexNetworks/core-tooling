@@ -16,8 +16,16 @@
 #
 # Required:
 #   CANSPACE_HOST
-#   CANSPACE_USER
-#   CANSPACE_PASSWORD
+#
+# Credentials should be stored in ~/.netrc, not in .env:
+#
+#   machine eos.canspace.ca
+#     login your-ftp-user@example.com
+#     password your-password
+#
+# Make sure ~/.netrc is only readable by your user:
+#
+#   chmod 600 ~/.netrc
 #
 # Optional:
 #   CANSPACE_PROTOCOL=ftp
@@ -40,13 +48,12 @@ CANSPACE_BUILD_DIR ?= $(SITE_DIR)/public
 
 canspace-check:
 	@test -n "$(CANSPACE_HOST)" || (echo "CANSPACE_HOST is not set" && exit 1)
-	@test -n "$(CANSPACE_USER)" || (echo "CANSPACE_USER is not set" && exit 1)
-	@test -n "$(CANSPACE_PASSWORD)" || (echo "CANSPACE_PASSWORD is not set" && exit 1)
+	@test -f "$(HOME)/.netrc" || (echo "$(HOME)/.netrc does not exist" && exit 1)
 	@test -d "$(CANSPACE_BUILD_DIR)" || (echo "$(CANSPACE_BUILD_DIR) does not exist" && exit 1)
 	@command -v lftp >/dev/null 2>&1 || (echo "lftp is not installed; run: brew install lftp" && exit 1)
 
 canspace-connect: canspace-check
-	lftp -d -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -d -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
@@ -58,7 +65,7 @@ canspace-connect: canspace-check
 		bye"
 
 canspace-dry-run: canspace-check
-	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
@@ -69,7 +76,7 @@ canspace-dry-run: canspace-check
 		bye"
 
 canspace-deploy: canspace-check
-	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
