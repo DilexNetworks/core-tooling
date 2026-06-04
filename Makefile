@@ -19,6 +19,7 @@ BUMPVER_FILE ?= .bumpversion.cfg
 # (node.mk, python.mk, smoke.mk, etc.)
 include mk/core.mk
 include mk/doctor.mk
+include mk/canspace.mk
 include mk/git.mk
 include mk/node.mk
 include mk/python.mk
