@@ -49,39 +49,49 @@ CANSPACE_BUILD_DIR ?= $(SITE_DIR)/public
 canspace-check:
 	@test -n "$(CANSPACE_HOST)" || (echo "CANSPACE_HOST is not set" && exit 1)
 	@test -f "$(HOME)/.netrc" || (echo "$(HOME)/.netrc does not exist" && exit 1)
+	@test "$$(stat -f %Lp $(HOME)/.netrc)" = "600" || (echo "$(HOME)/.netrc must be chmod 600" && exit 1)
 	@test -d "$(CANSPACE_BUILD_DIR)" || (echo "$(CANSPACE_BUILD_DIR) does not exist" && exit 1)
 	@command -v lftp >/dev/null 2>&1 || (echo "lftp is not installed; run: brew install lftp" && exit 1)
 
 canspace-connect: canspace-check
-	lftp -d -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -d -e "\
+		set netrc:enabled yes; \
+		set netrc:file $(HOME)/.netrc; \
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
 		set net:reconnect-interval-base 5; \
 		set ftp:passive-mode yes; \
 		set ftp:ssl-allow yes; \
+		open -p $(CANSPACE_PORT) $(CANSPACE_PROTOCOL)://$(CANSPACE_HOST); \
 		pwd; \
 		ls; \
 		bye"
 
 canspace-dry-run: canspace-check
-	lftp -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -e "\
+		set netrc:enabled yes; \
+		set netrc:file $(HOME)/.netrc; \
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
 		set net:reconnect-interval-base 5; \
 		set ftp:passive-mode yes; \
 		set ftp:ssl-allow yes; \
+		open -p $(CANSPACE_PORT) $(CANSPACE_PROTOCOL)://$(CANSPACE_HOST); \
 		mirror -R --dry-run --delete --verbose $(CANSPACE_BUILD_DIR)/ $(CANSPACE_REMOTE_DIR)/; \
 		bye"
 
 canspace-deploy: canspace-check
-	lftp -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -e "\
+		set netrc:enabled yes; \
+		set netrc:file $(HOME)/.netrc; \
 		set dns:order inet; \
 		set net:max-retries 1; \
 		set net:timeout 20; \
 		set net:reconnect-interval-base 5; \
 		set ftp:passive-mode yes; \
 		set ftp:ssl-allow yes; \
+		open -p $(CANSPACE_PORT) $(CANSPACE_PROTOCOL)://$(CANSPACE_HOST); \
 		mirror -R --delete --verbose $(CANSPACE_BUILD_DIR)/ $(CANSPACE_REMOTE_DIR)/; \
 		bye"
