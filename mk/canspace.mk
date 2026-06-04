@@ -1,5 +1,3 @@
-
-
 # =============================================================================
 # CanSpace Deployment
 # =============================================================================
@@ -23,6 +21,7 @@
 #
 # Optional:
 #   CANSPACE_PROTOCOL=sftp
+#   CANSPACE_PORT=5622
 #   CANSPACE_REMOTE_DIR=/public_html
 #   CANSPACE_BUILD_DIR=$(SITE_DIR)/public
 #
@@ -30,6 +29,7 @@
 -include .env
 
 CANSPACE_PROTOCOL ?= sftp
+CANSPACE_PORT ?= 5622
 CANSPACE_REMOTE_DIR ?= /public_html
 CANSPACE_BUILD_DIR ?= $(SITE_DIR)/public
 
@@ -43,13 +43,13 @@ canspace-check:
 	@command -v lftp >/dev/null 2>&1 || (echo "lftp is not installed; run: brew install lftp" && exit 1)
 
 canspace-dry-run: canspace-check
-	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
 		set sftp:auto-confirm yes; \
 		mirror -R --dry-run --delete --verbose $(CANSPACE_BUILD_DIR)/ $(CANSPACE_REMOTE_DIR)/; \
 		bye"
 
 canspace-deploy: canspace-check
-	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
+	lftp -u "$(CANSPACE_USER),$(CANSPACE_PASSWORD)" -p "$(CANSPACE_PORT)" "$(CANSPACE_PROTOCOL)://$(CANSPACE_HOST)" -e "\
 		set sftp:auto-confirm yes; \
 		mirror -R --delete --verbose $(CANSPACE_BUILD_DIR)/ $(CANSPACE_REMOTE_DIR)/; \
 		bye"
